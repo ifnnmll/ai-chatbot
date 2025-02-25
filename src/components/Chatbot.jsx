@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchGeminiResponse } from "../api";
-import { Plus, Search, X } from "lucide-react";
+import { Plus, Search, X, Mic, Image as ImageIcon } from "lucide-react";
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -11,6 +11,7 @@ const Chatbot = () => {
   const [typingResponse, setTypingResponse] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [hasTyped, setHasTyped] = useState(false);
+  const [recording, setRecording] = useState(false);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -45,6 +46,20 @@ const Chatbot = () => {
   const startNewChat = () => {
     setMessages([]);
     setHasTyped(false);
+  };
+
+  const startRecording = () => {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "id-ID";
+    recognition.start();
+    setRecording(true);
+
+    recognition.onresult = (event) => {
+      setInput(event.results[0][0].transcript);
+      setRecording(false);
+    };
+
+    recognition.onerror = () => setRecording(false);
   };
 
   return (
@@ -87,7 +102,7 @@ const Chatbot = () => {
       <div className="flex-1 flex flex-col h-screen">
         <div className="bg-gray-800 text-white p-4 flex items-center justify-between border-b border-gray-700">
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden text-xl">☰</button>
-          <h2 className="text-lg font-bold">Aipan's Chatbot</h2>
+          <h2 className="text-lg font-bold">Aipan'sGPT</h2>
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center px-16 py-6 space-y-4 border-b border-gray-700">
@@ -114,19 +129,15 @@ const Chatbot = () => {
                   </span>
                 </div>
               ))}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <span className="px-4 py-3 rounded-lg bg-gray-700 text-white max-w-3xl text-base">
-                    {typingResponse}
-                  </span>
-                </div>
-              )}
             </div>
           )}
         </div>
 
         {hasTyped && (
           <div className="p-4 flex bg-gray-900">
+            <button onClick={startRecording} className="mr-2 bg-blue-500 text-white px-4 py-3 rounded-lg">
+              <Mic size={20} />
+            </button>
             <input
               type="text"
               className="flex-1 p-3 border rounded-lg text-base bg-gray-800 text-white placeholder-gray-400 border-gray-700"

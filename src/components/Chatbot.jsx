@@ -1,69 +1,92 @@
 import { useState } from "react";
-import { FaPaperPlane } from "react-icons/fa";
+import { fetchGeminiResponse } from "../api";
+import { Plus, Search, X } from "lucide-react";
 
 const Chatbot = () => {
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [response, setResponse] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSend = async () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
-    setIsLoading(true);
 
-    // Simulasi API Call (Ubah sesuai API yang digunakan)
-    setTimeout(() => {
-      setResponse(`Jawaban AI: ${input}`);
-      setIsLoading(false);
-      setInput("");
-    }, 1500);
+    const newMessages = [...messages, { text: input, sender: "user" }];
+    setMessages(newMessages);
+    setInput("");
+
+    const botReply = await fetchGeminiResponse(input);
+    const updatedMessages = [...newMessages, { text: botReply, sender: "bot" }];
+    setMessages(updatedMessages);
+
+    setHistory([{ question: input, answer: botReply }, ...history]);
+  };
+
+  const startNewChat = () => {
+    setMessages([]);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200 p-6">
-      <div className="w-full max-w-lg bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl shadow-2xl p-6">
-        {/* Header Chatbot */}
-        <h2 className="text-3xl font-extrabold text-blue-700 text-center">
-          Gemini AI Chatbot
-        </h2>
-        <p className="text-gray-500 text-center mt-2 mb-4">
-          Ajukan pertanyaanmu dan dapatkan jawaban instan!
-        </p>
+    <div className="flex h-screen w-full bg-gray-900">
+      {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 md:hidden" onClick={() => setSidebarOpen(false)}></div>}
 
-        {/* Chatbox */}
-        <div className="w-full h-80 p-4 bg-gray-100 rounded-xl overflow-y-auto space-y-3">
-          {response ? (
-            <div className="flex justify-end">
-              <div className="bg-blue-500 text-white p-3 rounded-lg max-w-[85%] text-left shadow-md">
-                {response}
-              </div>
+      <div className={`fixed md:relative h-screen w-72 bg-gray-800 text-white p-4 flex flex-col border-r border-gray-700 transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-72 md:translate-x-0"}`}>
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={startNewChat} className="flex items-center space-x-2 text-white">
+            <Plus size={20} />
+            <span>New Chat</span>
+          </button>
+          <button className="text-white">
+            <Search size={20} />
+          </button>
+          <button onClick={() => setSidebarOpen(false)} className="text-white md:hidden">
+            <X size={20} />
+          </button>
+        </div>
+        <input
+          type="text"
+          className="w-full p-2 mb-3 rounded bg-gray-700 text-white placeholder-gray-400"
+          placeholder="Search history..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <div className="flex-1 overflow-y-auto space-y-2">
+          {history.filter((item) => item.question.toLowerCase().includes(searchQuery.toLowerCase())).map((item, index) => (
+            <div key={index} className="p-2 bg-gray-700 rounded-lg cursor-pointer">
+              <p className="text-sm font-semibold">You: {item.question}</p>
+              <p className="text-xs text-gray-300">Bot: {item.answer.slice(0, 50)}...</p>
             </div>
-          ) : (
-            <p className="text-gray-400 text-center">Belum ada jawaban...</p>
-          )}
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col h-screen">
+        <div className="bg-gray-800 text-white p-4 flex items-center justify-between border-b border-gray-700">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden text-xl">☰</button>
+          <h2 className="text-lg font-bold">Aipan'sGPT</h2>
         </div>
 
-        {/* Input Chat */}
-        <div className="flex items-center mt-4 space-x-2">
-          <textarea
-            className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-none"
-            rows="2"
+        <div className="flex-1 overflow-y-auto px-10 py-6 space-y-4 border-b border-gray-700">
+          {messages.map((msg, index) => (
+            <div key={index} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+              <span className={`px-4 py-3 rounded-lg max-w-3xl text-base ${msg.sender === "user" ? "bg-green-500 text-white" : "bg-gray-700 text-white"}`}>
+                {msg.text}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="p-4 flex bg-gray-900">
+          <input
+            type="text"
+            className="flex-1 p-3 border rounded-lg text-base bg-gray-800 text-white placeholder-gray-400 border-gray-700"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ketik pertanyaanmu..."
-          ></textarea>
-
-          {/* Tombol Kirim */}
-          <button
-            className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
-            onClick={handleSend}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <span className="animate-pulse">...</span>
-            ) : (
-              <FaPaperPlane className="text-lg" />
-            )}
-          </button>
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            placeholder="Type a message..."
+          />
+          <button onClick={sendMessage} className="ml-2 bg-green-500 text-white px-6 py-3 rounded-lg">Send</button>
         </div>
       </div>
     </div>

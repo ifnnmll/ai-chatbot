@@ -7,12 +7,16 @@ const endpoint =
 export const fetchGeminiResponse = async (prompt) => {
   try {
     const response = await axios.post(`${endpoint}?key=${apiKey}`, {
-      contents: [{ parts: [{ text: prompt }] }],
+      contents: [{ role: "user", parts: [{ text: prompt }] }] // ✅ Tambah role: "user"
     });
 
-    return response.data.candidates[0]?.content.parts[0]?.text || "No response";
+    // ✅ Perbaiki akses data secara aman
+    const reply =
+      response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+
+    return reply;
   } catch (error) {
-    console.error("Error fetching Gemini API:", error);
+    console.error("Error fetching Gemini API:", error.response?.data || error.message);
     return "Error fetching response.";
   }
 };

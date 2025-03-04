@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { fetchGeminiResponse } from "../api";
-import { Plus, Search, X, Mic } from "lucide-react";
+import { Plus, Search, X, Mic, ArrowUp, Square } from "lucide-react";
+import FileUpload from "./FileUpload";
+
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -12,6 +14,7 @@ const Chatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [hasTyped, setHasTyped] = useState(false);
   const [recording, setRecording] = useState(false);
+  const typingInterval = useRef(null);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -31,16 +34,22 @@ const Chatbot = () => {
   const simulateTypingEffect = (text) => {
     const words = text.split(" ");
     let index = 0;
-    const interval = setInterval(() => {
+    typingInterval.current = setInterval(() => {
       setTypingResponse((prev) => prev + (index > 0 ? " " : "") + words[index]);
       index++;
       if (index === words.length) {
-        clearInterval(interval);
+        clearInterval(typingInterval.current);
         setMessages((prev) => [...prev, { text, sender: "bot" }]);
         setTypingResponse("");
         setIsTyping(false);
       }
     }, 300);
+  };
+
+  const stopTyping = () => {
+    clearInterval(typingInterval.current);
+    setIsTyping(false);
+    setTypingResponse("");
   };
 
   return (
@@ -58,8 +67,8 @@ const Chatbot = () => {
           </button>
         </div>
       </div>
-      <div className="flex-1 flex flex-col h-screen">
-        <div className="flex-1 flex flex-col items-center justify-center px-16 py-6 space-y-4 border-b border-gray-700">
+      <div className="flex-1 flex flex-col h-screen p-4 md:p-6">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-16 py-6 space-y-4 border-b border-gray-700">
           {messages.length === 0 ? (
             <p className="text-gray-400 text-lg">Apa yang bisa saya bantu?</p>
           ) : (
@@ -81,9 +90,10 @@ const Chatbot = () => {
             </div>
           )}
         </div>
-        <div className="p-4 flex bg-gray-900">
-          <button className="mr-2 bg-blue-500 text-white px-4 py-3 rounded-lg">
-            <Mic size={20} />
+        <div className="p-4 flex bg-gray-900 gap-2">
+        <FileUpload />  
+          <button className="bg-white p-3 rounded-full flex items-center justify-center">
+            <Mic size={20} className="text-black" />
           </button>
           <input
             type="text"
@@ -93,7 +103,15 @@ const Chatbot = () => {
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder="Type a message..."
           />
-          <button onClick={sendMessage} className="ml-2 bg-green-500 text-white px-6 py-3 rounded-lg">Send</button>
+          {isTyping ? (
+            <button onClick={stopTyping} className="bg-white p-3 rounded-full flex items-center justify-center">
+              <Square size={24} className="text-black" />
+            </button>
+          ) : (
+            <button onClick={sendMessage} className="bg-white p-3 rounded-full flex items-center justify-center">
+              <ArrowUp size={24} className="text-black" />
+            </button>
+          )}
         </div>
       </div>
     </div>

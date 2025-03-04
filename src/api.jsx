@@ -5,7 +5,8 @@ if (!apiKey) {
   console.error("API Key tidak ditemukan! Pastikan sudah diatur di .env");
 }
 
-const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
+
 
 export const fetchGeminiResponse = async (prompt) => {
   try {

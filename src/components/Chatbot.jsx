@@ -7,16 +7,13 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([]);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen w-screen bg-gray-900 text-white">
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Chat Content */}
-      <div className="flex flex-col flex-grow p-4 bg-white">
-        {/* Message List */}
+      {/* Chat Area */}
+      <div className="flex flex-col flex-grow bg-gray-800">
         <MessageList messages={messages} />
-
-        {/* Input */}
         <MessageInput setMessages={setMessages} />
       </div>
     </div>

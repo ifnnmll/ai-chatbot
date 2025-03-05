@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { fetchGeminiResponse } from "../api/api";
-import FileUpload from "./FileUpload";
-import VoiceInput from "./VoiceInput";
-import { Mic, ArrowUp } from "lucide-react";
+import { Paperclip, Mic, ArrowUp } from "lucide-react";
 
 const MessageInput = ({ setMessages }) => {
   const [input, setInput] = useState("");
@@ -18,17 +16,22 @@ const MessageInput = ({ setMessages }) => {
   };
 
   return (
-    <div className="message-input">
-      <FileUpload setMessages={setMessages} />
-      <VoiceInput setMessages={setMessages} />
+    <div className="flex items-center bg-gray-700 p-4 border-t border-gray-600">
+      <button className="p-2 text-gray-400 hover:text-white">
+        <Paperclip size={24} />
+      </button>
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-        placeholder="Type a message..."
+        placeholder="Tanyakan apa saja..."
+        className="flex-grow p-2 border rounded-lg bg-gray-800 text-white outline-none"
       />
-      <button onClick={sendMessage}>
+      <button className="p-2 text-gray-400 hover:text-white">
+        <Mic size={24} />
+      </button>
+      <button onClick={sendMessage} className="p-2 bg-blue-600 rounded-full text-white">
         <ArrowUp size={24} />
       </button>
     </div>

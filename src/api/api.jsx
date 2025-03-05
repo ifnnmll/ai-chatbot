@@ -7,7 +7,6 @@ if (!apiKey) {
 
 const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
 
-
 export const fetchGeminiResponse = async (prompt) => {
   try {
     console.log("Menggunakan API Key:", apiKey);
@@ -26,7 +25,6 @@ export const fetchGeminiResponse = async (prompt) => {
 
     console.log("Response dari API:", response.data);
 
-    // Ambil teks balasan AI dengan aman
     const reply =
       response.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "Maaf, saya tidak bisa menjawab.";
@@ -35,7 +33,6 @@ export const fetchGeminiResponse = async (prompt) => {
   } catch (error) {
     console.error("Error saat mengambil respons dari Gemini API:", error);
     
-    // Cek apakah ada response dari server
     if (error.response) {
       console.error("Detail Kesalahan:", error.response.data);
       return `Error: ${error.response.data.error?.message || "Terjadi kesalahan saat mengambil data."}`;

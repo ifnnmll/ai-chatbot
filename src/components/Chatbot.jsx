@@ -8,10 +8,7 @@ const Chatbot = () => {
 
   return (
     <div className="flex h-screen w-screen bg-gray-900 text-white">
-      {/* Sidebar */}
       <Sidebar />
-
-      {/* Chat Area */}
       <div className="flex flex-col flex-grow bg-gray-800">
         <MessageList messages={messages} />
         <MessageInput setMessages={setMessages} />

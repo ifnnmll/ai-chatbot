@@ -1,6 +1,6 @@
 const MessageList = ({ messages }) => {
   return (
-    <div className="flex-grow overflow-y-auto p-6 flex flex-col items-center space-y-6">
+    <div className="flex-grow overflow-y-auto p-6 flex flex-col items-center justify-center h-full space-y-6">
       {messages.length === 0 ? (
         <p className="text-gray-400 text-center">Apa yang bisa saya bantu?</p>
       ) : (
@@ -9,7 +9,6 @@ const MessageList = ({ messages }) => {
             {/* Garis pemisah antar chat */}
             {index > 0 && <div className="w-full border-t border-gray-600 my-4"></div>}
 
-            {/* Pesan dari user (pertanyaan) */}
             {msg.sender === "user" ? (
               <div className="self-end bg-gray-700 text-white px-3 py-2 rounded-lg text-sm max-w-fit">
                 {msg.text}

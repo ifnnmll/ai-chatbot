@@ -1,38 +1,59 @@
 import { useState } from "react";
-import NewChat from "./NewChat";
-import SearchChat from "./SearchChat";
-import { History, Settings } from "lucide-react";
+import { History, Settings, Menu } from "lucide-react";
 
 const Sidebar = () => {
-  const [searchActive, setSearchActive] = useState(false);
-
-  const handleNewChat = () => {
-    alert("Mulai obrolan baru!");
-  };
-
-  const handleSearchChat = () => {
-    setSearchActive(!searchActive);
-    alert("Cari obrolan"); 
-  };
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="w-72 h-screen bg-gray-900 text-gray-200 p-6 flex flex-col">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-bold">AiAnfor</h2>
-        <div className="flex gap-2">
-          <SearchChat onClick={handleSearchChat} />
-          <NewChat onClick={handleNewChat} />
+    <>
+      {/* Tombol menu untuk mobile */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded-full"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <Menu size={24} />
+      </button>
+
+      {/* Sidebar */}
+      <div
+        className={`fixed md:relative top-0 left-0 h-full bg-gray-900 text-gray-200 p-6 flex flex-col transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 transition-transform duration-300 ease-in-out w-72 z-40`}
+      >
+        {/* Header Sidebar */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-bold">AiAnfor</h2>
+          <div className="flex gap-3">
+            <button className="text-gray-400 hover:text-white">
+              <History size={22} />
+            </button>
+            <button className="text-gray-400 hover:text-white">
+              <Settings size={22} />
+            </button>
+          </div>
+          {/* Tombol tutup di mobile */}
+          <button
+            className="md:hidden text-gray-400 hover:text-white"
+            onClick={() => setIsOpen(false)}
+          >
+            ✕
+          </button>
         </div>
+
+        {/* Konten Sidebar (Tambahan jika perlu) */}
+        <ul className="space-y-4">
+          {/* Bisa ditambahkan menu lain di sini */}
+        </ul>
       </div>
-      <ul className="space-y-4">
-        <li className="flex items-center gap-2 cursor-pointer hover:text-white">
-          <History size={20} /> Riwayat
-        </li>
-        <li className="flex items-center gap-2 cursor-pointer hover:text-white">
-          <Settings size={20} /> Pengaturan
-        </li>
-      </ul>
-    </div>
+
+      {/* Overlay untuk menutup sidebar di mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 md:hidden z-30"
+          onClick={() => setIsOpen(false)}
+        ></div>
+      )}
+    </>
   );
 };
 
